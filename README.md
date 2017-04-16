@@ -1,4 +1,5 @@
 # works of Business-Analytics-Using-Statistical-Modeling
+[Syllabus](https://docs.google.com/document/d/16tJRDWFf08HkoNVybOftKvHQw7PpKwqtvXd5brLBvNg/edit#heading=h.gjdgxs)
 
 Course Description:
 
