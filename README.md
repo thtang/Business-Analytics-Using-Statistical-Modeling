@@ -1,0 +1,9 @@
+# works of Business-Analytics-Using-Statistical-Modeling
+
+Course Description:
+
+This class covers computational statistical methods used to understand and explain business phenomena. We favor techniques for research and development in service management and marketing.
+Methodological focus: We will use analytics to explain business phenomena and inform decision making by: describing and visualizing data; creating statistical models from domain knowledge; testing our domain understanding against data; creating experiments; and guarding against fallacious use of statistics.
+Statistical focus: We will take a computational approach to statistics by using programming techniques to overcome limitations of data quality and quantity. We will learn to reshape data, simulate data and statistics, discover unseen dimensions in data, and create complex models of unobservable phenomena.
+Technical focus: We will learn to write data analytics code in R on par with industry standards. Students will implement their own algorithms, write code that is highly readable and reusable, produce high performance code, create bespoke visualizations, and apply different styles of analytic programming.
+Practical focus: We will regularly solve real problems on real data gathered from industry partners, and practitioners, and management/marketing research. Students will quickly find that these problems and data do not conform to traditional statistical techniques.
