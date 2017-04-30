@@ -1,8 +1,9 @@
 ---
 title: "HW10"
 output:
-  word_document: default
+  html_document: default
   html_notebook: default
+  word_document: default
 ---
 
 Question 1) Model fit is often determined by R 2 so let’s dig into what this perspective of model fit is all about.Download demo_simple_regression_sq.R from Canvas – it has a function that runs a regression simulation.This week, the simulation also reports R 2 along with the other metrics from last week.
