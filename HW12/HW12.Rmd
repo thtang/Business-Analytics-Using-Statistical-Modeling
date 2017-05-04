@@ -1,0 +1,52 @@
+---
+title: "HW12"
+output: html_notebook
+---
+
+
+```{r}
+auto <- read.table("auto-data.txt", header=FALSE, na.strings = "?", stringsAsFactors = F)
+names(auto) <- c("mpg", "cylinders", "displacement", "horsepower", "weight",
+"acceleration", "model_year", "origin", "car_name")
+cars_log <- with(auto, data.frame(log(mpg), log(cylinders), log(displacement), log(horsepower), log(weight), log(acceleration), model_year, origin))
+```
+Question 1) Let’s visualize how acceleration is related to mpg:
+
+a). Let’s visualize how weight might moderate the relationship between acceleration and mpg:
+
+i. Create two subsets of your data, one for light weight cars (less than mean weight) and one for heavy cars (higher than the mean weight) HINT: careful how you compare log weights to mean weight
+
+```{r}
+light_weight <- subset(cars_log,log.weight. < log(mean(auto$weight)))
+heavy_weight <- subset(cars_log,log.weight. >= log(mean(auto$weight)))
+light_weight
+```
+
+ii. Create a single scatter plot of acceleration vs. mpg, with different colors and/or shapes for light versus heavy cars
+```{r}
+library(dplyr)
+cars_log <- cars_log %>% mutate(weight_level = ifelse(log.weight.>= log(mean(auto$weight)),
+                                                      "heavy","light"))
+library(ggplot2)
+plt <- ggplot(data = cars_log, aes(x = log.acceleration., y=log.mpg., col = factor(weight_level)))+
+  geom_point()
+plt
+```
+
+iii. Draw two slopes of acceleration versus mpg over the scatter plot: one for light cars and one for heavy cars (distinguish their appearance)
+```{r}
+plt+geom_smooth(method = lm,fullrange = TRUE)
+```
+
+b). Report the full summaries of two separate regressions for light and heavy cars where log.mpg. is dependent on log.weight., log.acceleration., model_year and origin
+```{r}
+heavy_lm <- lm(data = heavy_weight, log.mpg.~ log.weight. + log.acceleration. + model_year + factor(origin))
+light_lm <- lm(data = light_weight, log.mpg.~ log.weight. + log.acceleration. + model_year + factor(origin))
+summary(heavy_lm)
+```
+```{r}
+summary(light_lm)
+```
+
+
+c). (not graded) Using your intuition only: What do you observe about light versus heavy cars so far?
