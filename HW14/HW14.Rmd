@@ -1,0 +1,103 @@
+---
+title: "HW14"
+output:
+  word_document: default
+  html_notebook: default
+---
+Answer are in black text.
+
+Question 1) We saw that identifying the number of principal components to keep can be challenging
+
+a). Report your earlier findings from applying the “eigenvalue > 1” and screeplot criteria to the security dataset.
+
+Previosly, we use the criteria mentioned above and selected the first three principle components. They could explained about 67% of the variance.
+
+b). Perform a parallel analysis to find out how many principal components have higher eigenvalues than their counterparts in random datasets of the same dimensions as the security dataset.
+
+```{r}
+sec_q <- read.csv("security_questions.csv")
+sec_pca <- prcomp(sec_q,scale. = TRUE)
+
+#create noise data frame
+sim_noise <- function(n,p){
+  noise <- data.frame(replicate(p,rnorm(n)))
+  return(eigen(cor(noise))$values)
+}
+set.seed(38)
+evalues_noise <- replicate(500, sim_noise(dim(sec_q)[1],dim(sec_q)[2]))
+evalues_mean <- apply(evalues_noise,1,mean)
+screeplot(sec_pca,type = "line",col="lightcoral",main = "Eigenvalues:Security vs. noise")
+lines(evalues_mean,type = "b")
+legend(4,6,c("True eigenvalues","simulated engenvalues"),lty=c(1,1),col=c("lightcoral","black"))
+
+```
+
+From the above screeplot, we can find out that the first **two principal** components have higher eigenvalues than random ones. 
+
+Question 2) Earlier, we examined the eigenvectors of the security dataset. This time, let’s examine loadings of our principal components (use the principal() method from the psych package)
+
+```{r}
+library(psych)
+principal(sec_q,nfactors = 3,rotate="none",scores = TRUE)
+```
+
+a). Looking at the loadings of the first 3 principal components, to which components does each item seem to belong?
+
+By setting the threshold of loading to 0.7, I have the following discovers:
+Q1, Q3, Q8, Q9, Q11, Q13, Q14, Q16 and Q18 seem to belong to PC1.
+No loading above 0.7 in PC2, but Q4, Q12, Q17 might beling to it.
+Also, in PC3 no loading above 0.7, Q5 and Q10 are explained by it more, relatively. 
+
+b). How much of the total variance of the security dataset does the first 3 PCs capture?
+
+67 percent of variance captured by the first 3 PCs.
+
+c). Looking at commonality and uniqueness, which item’s variance is least explained by the first 3 principal components?
+
+Q2 is least explained by the first 3 principal components with h2 value of 0.46 .
+
+d). How many measurement items share similar loadings between 2 or more components?
+
+About four, Q4, Q7, Q12 and Q17.
+
+e). Can you distinguish a ‘meaning’ behind the first principal component from the items that load best upon it? (see the wording of the questions of those items)
+
+Whether users satisfied about the control of the confidentiality of the transactions.
+
+
+Question 3) To improve interpretability of loadings, let’s rotate the our principal component axes to get rotated components (extract and rotate only three principal components)
+
+```{r}
+principal(sec_q,nfactors = 3,rotate="varimax",scores = TRUE)
+```
+
+
+a). Individually, does each rotated component explain the same, or different, amount of variance than the three principal components?
+
+Variance explained are **different**.
+
+b). Together, do the three rotated components explain the same, more, or less cumulative variance as the three principal components combined?
+
+Cumulative variance is the same, 67% percent.
+
+c). Looking back at the items that shared similar loadings with multiple principal components, do those items have more clearly differentiated loadings among rotated components?
+
+According to RC1 it's obviously that those items have more clearly differentiated.
+
+d). Can you now interpret the “meaning” of the 3 rotated components from the items that load best upon each of them? (see the wording of the questions of those items)
+
+RC1: Q7 Q9 Q11 Q14 Q16 => Personal information protection
+RC3: Q5 Q8 Q10 => Process of transaction
+RC2: Q4 Q12 Q17 =>  Evidence to protect against its denial 
+
+e). If we reduced the number of extracted and rotated components to 2, does the meaning of our rotated components change?
+
+```{r}
+principal(sec_q,nfactors = 2,rotate="varimax",scores = TRUE)
+```
+
+Yes. We can find out that RC1 have more items belong to than the previous model.
+
+(ungraded) Looking back at all our results and analyses, how many components (1-3) do you believe we should extract and analyze to understand the security dataset? Feel free to suggest different answers for different purposes.
+
+We implement PCA for dealing with the curse of dimensionality, but here we could see that the dimension is not that big. Besides, from the above analysis the cumulative variance explained is not exceed 80%, so I think 3 components should be better.
