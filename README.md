@@ -14,4 +14,4 @@ _Technical focus_: We will learn to write data analytics code in R on par with i
 _Practical focus_: We will regularly solve real problems on real data gathered from industry partners, and practitioners, and management/marketing research. Students will quickly find that these problems and data do not conform to traditional statistical techniques.
 
 ## Keywords : 
-`Simulation` &nbsp; ` Hypothesis Testing`  &nbsp;` Bootstrapped Testing` &nbsp; `Analysis of Variance` &nbsp; `Design of Experiments` <br> `OLS Regression`
+`Simulation` &nbsp; ` Hypothesis Testing`  &nbsp;` Bootstrapped Testing` &nbsp; `Analysis of Variance` &nbsp; `Design of Experiments` <br> `OLS Regression` `PLS Path Modeling`
