@@ -1,0 +1,93 @@
+---
+title: "HW15"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+
+Question 1) Create a PLS path model using SmartPLS, with the following characteristics:
+
+
+a).Create a PLS path model using SmartPLS, with the following characteristics:
+
+i. Measurement of constructs by items
+  1. Trust in website (TRUST): reflective construct with items TRST1-4
+  2. Perceived security of website (SEC): reflective construct with items PSEC1-4
+  3. Reputation of website (REP): formative construct with items PREP1-4
+  4. Investment in website (INV): reflective construct with PINV1-3
+  5. Perception of policy (POL): reflective construct with items PPSS1-3
+  6. Familiarity with website (FAML): single-item construct measured by FAML1
+ii. Interaction between REP and POL (use orthogonalized product terms)
+iii. Structural paths between constructs (shown as causal models -- note direction of arrows):
+  1. SEC ← REP + INV + POL + FAML + REP.POL
+  2. TRUST ← SEC
+
+```{r}
+library(seminr)
+sec = read.csv("security_data.csv")
+
+# Measurement Model 
+sec_mm <- measure(
+  form("REP",multi_items("PREP",1:4)),
+  reflect("INV", multi_items("PINV",1:3)),
+  reflect("POL", multi_items("PPSS",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("TRUST", multi_items("TRST", 1:4)),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+#interaction term
+sec_intxn <- interact(
+  interaction_ortho("REP","POL")
+)
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("REP","INV","POL","FAML","REP.POL"), to = "SEC"),
+  paths(from = "SEC", to = "TRUST")
+)
+
+#run PLS
+
+sec_pls <- estimate_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm,
+                          interactions = sec_intxn)
+
+```
+
+b). Show us the following results in table of figure formats:
+
+i. Loadings of reflective factors / Weights of formative factors
+
+```{r}
+sec_pls$outer_loadings
+```
+
+```{r}
+sec_pls$outer_weights
+```
+
+ii. Regression coefficients of paths between factors
+
+```{r}
+print_paths(sec_pls)
+```
+
+iii. Bootstrapped path coefficients: t-values, p-values (are any paths not significant at p=5% ?)
+
+```{r}
+boot_pls <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm,
+                          interactions = sec_intxn,
+                          nboot = 1000)
+```
+```{r}
+print_paths(boot_pls)
+```
+
+From the above table, we can find out that FAML and REP.POL are insignificant paths.
+
+
