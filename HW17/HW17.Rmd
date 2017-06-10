@@ -1,0 +1,325 @@
+---
+title: "HW17"
+output:
+  word_document: default
+  html_notebook: default
+  html_document: default
+---
+
+We will keep working on the model from our last assignment, though we will now remove factors that were
+insignificant in our prior study:
+Reputation (REP) + Policies (POL) + Perceived Website Investment (INV) + Familiarity (FAML) →
+Perceived Security (SEC) → Trust (TRUST)
+Note: REP, POL, INV, and FAML are antecedents ; SEC is a mediator ; and TRUST is the outcome
+
+```{r}
+library(seminr)
+sec = read.csv("security_data.csv")
+
+# Measurement Model 
+sec_mm <- measure(
+  form("REP",multi_items("PREP",1:4)),
+  reflect("INV", multi_items("PINV",1:3)),
+  reflect("POL", multi_items("PPSS",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("TRUST", multi_items("TRST", 1:4)),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("REP","INV","POL","FAML"), to = "SEC"),
+  paths(from = "SEC", to = "TRUST")
+)
+
+#run PLS
+
+sec_pls <- estimate_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+```
+
+Question 1) Let’s check the measurement quality criteria for our model.
+
+a). Check item reliability of all factors:
+i. Reflective factors: λ > 0.70
+“ Do items individually share variance with their proper constructs?”
+
+```{r}
+sec_pls$outer_loadings
+```
+
+From the above table, we can find out most of the variable share variance with their proper constructs. However, the loadins of PREP1 did not exceed 0.7 !
+
+
+ii. Formative factors: VIF of items < 5
+“Do items individually contribute substantially meaningful variance to their constructs?
+
+```{r}
+sec_pls$outer_weights[multi_items("PREP",1:4),"REP"]
+```
+
+Check VIF if formaticve items
+```{r}
+prep1_regr <-lm(sec$PREP1 ~ sec$PREP2 + sec$PREP3 + sec$PREP4)
+prep1_r2 <-summary(prep1_regr)$r.squared
+prep1_vif <-1 / (1 -prep1_r2)
+
+prep2_regr <-lm(sec$PREP2 ~ sec$PREP1 + sec$PREP3 + sec$PREP4)
+prep2_r2 <-summary(prep2_regr)$r.squared
+prep2_vif <-1 / (1 -prep2_r2)
+
+
+prep3_regr <-lm(sec$PREP3 ~ sec$PREP2 + sec$PREP1 + sec$PREP4)
+prep3_r2 <-summary(prep3_regr)$r.squared
+prep3_vif <-1 / (1 -prep3_r2)
+
+
+prep4_regr <-lm(sec$PREP4 ~ sec$PREP2 + sec$PREP3 + sec$PREP1)
+prep4_r2 <-summary(prep4_regr)$r.squared
+prep4_vif <-1 / (1 -prep4_r2)
+
+cat("prep1",prep1_vif,"\nprep2",prep2_vif,"\nprep3",prep3_vif,"\nprep4",prep4_vif)
+```
+
+VIF of each items didn't exceed 5.
+
+b). Convergent validity (reflective factors only):
+
+i. Composite Reliability (CR) of factors: CR > 0.70
+“How much do the items of a reflect factor agree with one another?”
+```{r}
+#INV
+INV_items<-multi_items("PINV", 1:3)
+INV_loadings<-sec_pls$outer_loadings[INV_items, "INV"]
+INV_CR <-sum(INV_loadings)^2 / (sum(INV_loadings)^2 + sum(1-INV_loadings)^2)
+
+#POL
+POL_items<-multi_items("PPSS",1:3) 
+POL_loadings<-sec_pls$outer_loadings[POL_items, "POL"]
+POL_CR <-sum(POL_loadings)^2 / (sum(POL_loadings)^2 + sum(1-POL_loadings)^2)
+
+FAML_items<-"FAML1"
+FAML_loadings<-sec_pls$outer_loadings[FAML_items, "FAML"]
+FAML_CR <-sum(FAML_loadings)^2 / (sum(FAML_loadings)^2 + sum(1-FAML_loadings)^2)
+
+cat("INV CR",INV_CR,"\nPOL CR", POL_CR, "\nFAML CR", FAML_CR)
+```
+
+All of the reflective fators' convergent validity are greater than 0.7.
+
+ii. Average Variance Extracted (AVE) of factors: AVE > 0.50
+“How much variance, on average, does a reflective factor explain of its own items?”
+
+```{r}
+INV_AVE <-sum(INV_loadings^2) / (sum(INV_loadings^2) + sum(1-INV_loadings^2) ) 
+POL_AVE <-sum(POL_loadings^2) / (sum(POL_loadings^2) + sum(1-POL_loadings^2) ) 
+FAML_AVE <-sum(FAML_loadings^2) / (sum(FAML_loadings^2) + sum(1-FAML_loadings^2) ) 
+
+cat("INV AVE",INV_AVE,"\nPOL AVE", POL_AVE, "\nFAML AVE", FAML_AVE)
+```
+
+All of them are greater than 0.5!
+
+c). Discriminant Validity (reflective factors only):
+
+i. Loadings of all items on own factors greater than cross-loadings with other factors
+“Are items more correlated with their own factors than other factors?”
+
+```{r}
+cat("INV cor\n")
+cor(sec[,INV_items], sec_pls$fscores)
+
+cat("\nPOL cor\n")
+cor(sec[,POL_items], sec_pls$fscores)
+
+cat("\nFAML cor\n")
+cor(sec[,FAML_items], sec_pls$fscores)
+```
+
+According to the correlation matrix above, all of the items are more correlated with their own factors.
+
+ii. Correlation of factor with other factors smaller than factor’s square root of AVE
+“Is a factor more related to its own items than it is to other factors?”
+
+```{r}
+sqrt(INV_AVE)
+sqrt(POL_AVE)
+sqrt(FAML_AVE)
+
+cor(sec_pls$fscores)
+```
+
+Yes, the factors are more related to their own items.
+
+Question 2) Does SEC really mediate relationships between REP, POL, INV → TRUST?
+
+a). With each of the three factors (REP, POL, INV), check the four parts of the mediation analysis we discussed in class
+
+i. Try using three models to test for mediation:
+
+- the proposed model
+
+```{r}
+# Measurement Model 
+sec_mm <- measure(
+  form("REP",multi_items("PREP",1:4)),
+  reflect("INV", multi_items("PINV",1:3)),
+  reflect("POL", multi_items("PPSS",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("TRUST", multi_items("TRST", 1:4)),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("REP","INV","POL","FAML"), to = "SEC"),
+  paths(from = "SEC", to = "TRUST")
+)
+
+#run PLS
+
+boot_sec <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+print_paths(boot_sec)
+```
+
+- the proposed model without the mediator
+
+```{r}
+# Measurement Model 
+sec_mm <- measure(
+  form("REP",multi_items("PREP",1:4)),
+  reflect("INV", multi_items("PINV",1:3)),
+  reflect("POL", multi_items("PPSS",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("TRUST", multi_items("TRST", 1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("REP","INV","POL","FAML"), to = "TRUST")
+)
+
+#run PLS
+
+boot_sec <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+print_paths(boot_sec)
+```
+
+
+- the proposed model with paths from antecedents to outcomes
+
+```{r}
+# Measurement Model 
+sec_mm <- measure(
+  form("REP",multi_items("PREP",1:4)),
+  reflect("INV", multi_items("PINV",1:3)),
+  reflect("POL", multi_items("PPSS",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("TRUST", multi_items("TRST", 1:4)),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("REP","INV","POL","FAML"), to = "SEC"),
+   paths(from = c("REP","INV","POL","FAML"), to = "TRUST"),
+  paths(from = "SEC", to = "TRUST")
+)
+
+#run PLS
+
+boot_sec <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+print_paths(boot_sec)
+```
+
+
+
+ii. When testing each of the three factors (REP, POL, INV), remove the other two factors, but keep FAML as a control
+
+```{r}
+# test REP to SEC
+# Measurement Model 
+sec_mm <- measure(
+  form("REP",multi_items("PREP",1:4)),
+  reflect("FAML","FAML1"),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("REP","FAML"), to = "SEC")
+)
+
+#run PLS
+
+boot_sec <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+print_paths(boot_sec)
+```
+```{r}
+# test POL
+# Measurement Model 
+sec_mm <- measure(
+  reflect("POL", multi_items("PPSS",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("POL","FAML"), to = "SEC")
+)
+
+#run PLS
+
+boot_sec <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+print_paths(boot_sec)
+```
+
+
+```{r}
+# test INV
+# Measurement Model 
+sec_mm <- measure(
+  reflect("INV", multi_items("PINV",1:3)),
+  reflect("FAML","FAML1"),
+  reflect("SEC",multi_items("PSEC",1:4))
+)
+
+
+#Structural Model
+sec_sm <- structure(
+  paths(from = c("INV","FAML"), to = "SEC")
+)
+
+#run PLS
+
+boot_sec <- bootstrap_model(data = sec,
+                          measurement_model = sec_mm,
+                          structural_model = sec_sm)
+print_paths(boot_sec)
+```
+
+b). Which factors are fully mediated by SEC, which are partially mediated by SEC, and which are not at all mediated by SEC?
+
+From the above model testing, we can conclude that:
+
+POL is fully mediated by SEC. INV and FAML is partially mediated by SEC. REP is not at all mediated by SEC.
+
+
