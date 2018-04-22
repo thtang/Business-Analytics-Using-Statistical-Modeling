@@ -15,3 +15,20 @@ _Practical focus_: We will regularly solve real problems on real data gathered f
 
 ## Keywords : 
 `Simulation` &nbsp; ` Hypothesis Testing`  &nbsp;` Bootstrapped Testing` &nbsp; `Analysis of Variance` &nbsp; `Design of Experiments` <br> `OLS Regression` `PLS Path Modeling`
+
+## Table of Content
+1. [Introduction to Computing](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW1)
+2. [Visualization, Simulation, Description](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW2)
+3. [Enter the Bootstrap](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW3)
+4. [Hypothesis Testing](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW4)
+5. [Bootstrapped Hypothesis Testing](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW5)
+6. [Analysis of Variance](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW6)
+7. [Experiments, Error, Power](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW7)
+9. [Data Similarity](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW9)
+10. [Linear Regression](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW10)
+11. [Nonlinearity and Multicollinearity](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW11)
+12. [Moderation and Mediation](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW12)
+13. [Principal Components Analysis](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW13)
+14. [Construct Measurement Models](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW14)
+15. [Structural Equation Modeling](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW15)
+17. [SEM Measurement and Structure](https://github.com/thtang/Business-Analytics-Using-Statistical-Modeling/tree/master/HW17)
